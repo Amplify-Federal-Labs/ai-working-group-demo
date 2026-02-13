@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
 	Avatar,
 	AvatarFallback,
@@ -7,9 +8,9 @@ import {
 export function Header() {
 	return (
 		<header className="flex items-center justify-between border-b px-6 py-4">
-			<span className="text-xl font-bold tracking-tight">
+			<Link to="/" className="text-xl font-bold tracking-tight">
 				Sneaker Depot
-			</span>
+			</Link>
 			<Avatar>
 				<AvatarImage src="" alt="User avatar" />
 				<AvatarFallback>U</AvatarFallback>
