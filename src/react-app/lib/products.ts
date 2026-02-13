@@ -1,17 +1,7 @@
-import { Hono } from "hono";
+import { Product } from './types';
 
-const app = new Hono<{ Bindings: Env }>();
-
-// Enable CORS for all routes
-app.use('*', async (c, next) => {
-  c.header('Access-Control-Allow-Origin', '*');
-  c.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  c.header('Access-Control-Allow-Headers', 'Content-Type');
-  await next();
-});
-
-// Sample product data (in a real app, this would come from a database)
-const sampleProducts = [
+// Sample sneaker data for the store
+export const sampleProducts: Product[] = [
   {
     id: '1',
     name: 'Air Jordan 1 Retro High OG "Chicago"',
@@ -159,81 +149,10 @@ const sampleProducts = [
 ];
 
 // Available filters for the store
-const availableFilters = {
+export const availableFilters = {
   brands: ['Nike', 'Adidas', 'Converse', 'Jordan'],
   sizes: [7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13],
-  conditions: ['New', 'Excellent', 'Good', 'Fair'],
+  conditions: ['New', 'Excellent', 'Good', 'Fair'] as const,
   categories: ['Basketball', 'Lifestyle', 'Running'],
   maxPrice: 500
 };
-
-// Main API endpoint
-app.get("/api/", (c) => c.json({ name: "Sneaker Store API" }));
-
-// Get all products
-app.get("/api/products", (c) => {
-  return c.json(sampleProducts);
-});
-
-// Get a specific product by ID
-app.get("/api/products/:id", (c) => {
-  const id = c.req.param("id");
-  const product = sampleProducts.find(p => p.id === id);
-  
-  if (!product) {
-    return c.json({ error: "Product not found" }, 404);
-  }
-  
-  return c.json(product);
-});
-
-// Get available filters
-app.get("/api/filters", (c) => {
-  return c.json(availableFilters);
-});
-
-// Search products
-app.get("/api/search", (c) => {
-  const query = c.req.query("q") || "";
-  const brand = c.req.query("brand") || "";
-  const size = c.req.query("size") || "";
-  const condition = c.req.query("condition") || "";
-  const category = c.req.query("category") || "";
-  const maxPrice = c.req.query("maxPrice") || "500";
-  
-  let results = [...sampleProducts];
-  
-  if (query) {
-    const lowerQuery = query.toLowerCase();
-    results = results.filter(p => 
-      p.name.toLowerCase().includes(lowerQuery) ||
-      p.brand.toLowerCase().includes(lowerQuery) ||
-      p.model.toLowerCase().includes(lowerQuery) ||
-      p.colorway.toLowerCase().includes(lowerQuery)
-    );
-  }
-  
-  if (brand) {
-    results = results.filter(p => p.brand === brand);
-  }
-  
-  if (size) {
-    results = results.filter(p => p.size === parseFloat(size));
-  }
-  
-  if (condition) {
-    results = results.filter(p => p.condition === condition);
-  }
-  
-  if (category) {
-    results = results.filter(p => p.category === category);
-  }
-  
-  if (maxPrice) {
-    results = results.filter(p => p.price <= parseFloat(maxPrice));
-  }
-  
-  return c.json(results);
-});
-
-export default app;
